@@ -1,8 +1,9 @@
+#include <netinet/in.h>
 #define SUCCESS 1
 #define FAILURE 0
 #define ERROR -1
 
-#define RETRY 3
+#define RETRY 14
 #define PACKET_MAX_SIZE 60000
 
 typedef struct RUDP_flags {
@@ -30,7 +31,7 @@ int RUDP_socket();
   @ return the socket number 
   * if fails return error 
 */
-int RUDP_receive(int socket, char **data, int *data_length);
+
 
 
 /*
@@ -54,7 +55,7 @@ int RUDP_wait_for_connection(int socket, int port);
     @returns 1 if received data packet , 0 if receives syn/ack packet, 2 if its the last data packet, 
             -1 if fails to receive, 2 if receives close request.
 */
-int RUDP_send(int socket, char *data, int data_length);
+int RUDP_send(int socket, char *data, int data_length, struct sockaddr *serverAddress, socklen_t *serverAddressLen, struct sockaddr *clientAddress, socklen_t *clientAddressLen);
 
 
 /*
@@ -64,12 +65,10 @@ int RUDP_send(int socket, char *data, int data_length);
     @param date_length - the length of the data
     @returns 1 if success, 0 if fails
 */
-int RUDP_receive(int socket, char **data, int *data_length);
+int RUDP_receive(int socket, int port, char **data, int *data_length);
 
 /*
   closes RUDP socket
 */
-int RUDP_close(int socket);
-
-
+int RUDP_close(int socket, struct sockaddr_in *clientAddress, socklen_t clientAddressLen);
 
