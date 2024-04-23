@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
 #include "RUDP_API.h"
 
+
+
 int main(int argc, char* argv[]){
     int port = atoi(argv[2]);  //convert port string into integer
-    //printf("%d", port);
+    printf("servers port number is %d\n", port);
 
     printf("-------- RUDP Receiver --------\n");
     int socket = RUDP_socket();
@@ -22,6 +25,19 @@ int main(int argc, char* argv[]){
         printf("failed to connect");
         return ERROR;
     }
+    printf("connected\n");
+
+    RUDP * packet = (RUDP*)malloc(sizeof(RUDP));
+    if (packet == NULL) {
+        return -1;
+    }  
+    //just a check 
+    memset(packet, 0, sizeof(RUDP));
+    int b = recvfrom(socket, packet, sizeof(RUDP), 0, NULL, 0);
+    if (b < 0) {
+        printf("ERROR B!!\n");
+    }
+    printf("%s\n", packet->data);
 
     //create file for saving the stats
     FILE* file = fopen("stats", "w+");
@@ -44,9 +60,9 @@ int main(int argc, char* argv[]){
     int number_of_runs = 0;
 
     do {
-        int rc = RUDP_receive(socket, &data, &data_length);
+        int rc = RUDP_receive(socket, port, &data, &data_length);
         if (rc == -1) {
-            printf("error. failed to receive");
+            printf("error. failed to receive\n");
             return ERROR;
         }
 
@@ -56,6 +72,8 @@ int main(int argc, char* argv[]){
 
         if (rc == 1 && start < end) {  // if its the first data packet, start the timer
             start = clock();
+            printf("got packet!");
+            printf("%s", data);
         }
 
         if (rc == 1) {  //if its data packet, add it to the total data
