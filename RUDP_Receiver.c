@@ -10,57 +10,50 @@
 
 int main(int argc, char* argv[]){
     int port = atoi(argv[2]);  //convert port string into integer
-    printf("servers port number is %d\n", port);
+    printf("Server's port number is %d\n", port);
 
     printf("-------- RUDP Receiver --------\n");
     int socket = RUDP_socket();
     if (socket == -1) {
-        printf("failed to create socket");
+        printf("Failed to create socket\n");
         return ERROR;
     }
 
     //connect the socket and port
-    int rc = RUDP_wait_for_connection(socket, port);
+    int rc = RUDP_listen(socket, port);
     if (rc == -1) {
-        printf("failed to connect");
+        printf("Failed to connect\n");
         return ERROR;
     }
-    printf("connected\n");
+    printf("Connected\n");
 
     RUDP * packet = (RUDP*)malloc(sizeof(RUDP));
     if (packet == NULL) {
         return -1;
     }  
-    //just a check 
-    memset(packet, 0, sizeof(RUDP));
-    int b = recvfrom(socket, packet, sizeof(RUDP), 0, NULL, 0);
-    if (b < 0) {
-        printf("ERROR B!!\n");
-    }
-    printf("%s\n", packet->data);
 
     //create file for saving the stats
     FILE* file = fopen("stats", "w+");
     if (file == NULL) {
-    printf("Error opening  stats file");
+    printf("Error opening  stats file\n");
     return 1;
     }
 
-
+    fprintf(file, "\n\n~~~~~~~~ Stats ~~~~~~~~\n");
     double average_time = 0;
     double average_speed = 0;
     clock_t start, end;
 
     char* data = NULL;
     int data_length = 0;
-    char total_data[2097152] = {0};  // 2MB
+    char total_data[2097152] = {0};  //2MB
 
     start = clock();
     end = clock();
     int number_of_runs = 0;
 
     do {
-        int rc = RUDP_receive(socket, port, &data, &data_length);
+        int rc = RUDP_receive(socket, &data, &data_length);
         if (rc == -1) {
             printf("error. failed to receive\n");
             return ERROR;
@@ -70,10 +63,8 @@ int main(int argc, char* argv[]){
             break;
         }
 
-        if (rc == 1 && start < end) {  // if its the first data packet, start the timer
+        if (rc == 1 && start < end) {  // if its the first data packet, start the timer.
             start = clock();
-            printf("got packet!");
-            printf("%s", data);
         }
 
         if (rc == 1) {  //if its data packet, add it to the total data
