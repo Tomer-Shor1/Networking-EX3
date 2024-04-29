@@ -108,3 +108,5 @@ void generate_random_buffer(char *buffer, size_t size) {
         buffer[i] = rand() % 256; // Random value between 0 and 255
     }
 }
+
+
