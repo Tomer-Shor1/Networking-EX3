@@ -1,10 +1,10 @@
 #include <netinet/in.h>
 #define SUCCESS 1
-#define FAILURE 0
 #define ERROR -1
-
+#define FAILURE 0
 #define RETRY 30
 #define PACKET_MAX_SIZE 1024 //changeable
+#define TIMEOUT_SEC 2
 
 
 /*
@@ -41,9 +41,9 @@ typedef struct _RUDP {
 
 
 /*
-  *creating RUDP socket
-  @ return the socket number 
-  * if fails return error 
+  * This function creates RUDP socket.
+  * return the socket number. 
+  * if fails return error. 
 */
 int RUDP_socket();
 
@@ -60,7 +60,7 @@ int RUDP_connect(int socket, char *ip, int port);
 
 
 /*
-    *listening for unpcoming connection requests.
+    *Listening for unpcoming connection requests.
     @param socket - the socket to listen on.
     @param port - the port of upcoming requests.
     *returns 1 if succes, 0 if fails.
@@ -69,11 +69,19 @@ int RUDP_listen(int socket, int port);
 
 
 /*
+  print buffer function - mostly used for debugging 
+  @param buffer - the buffer to print
+  @param size - size of the buffer
+*/
+void print_buffer(const char *buffer, size_t size);
+
+
+/*
     *send data to the peer on RUDP.
     @param socket - the socket to send on.
     @param data - the data to send.
-    @param data_length - the length of the data
-    @returns 1 if success, 0 if fails
+    @param data_length - the length of the data.
+    @returns 1 if success, 0 if fails.
 
 */
 int RUDP_send(int socket, char *data, int data_length);
@@ -95,10 +103,3 @@ int RUDP_receive(int socket, char **data, int *data_length);
 */
 int RUDP_close(int socket);
 
-
-/*
-  print buffer function - mostly used for debugging 
-  @param buffer - the buffer to print
-  @param size - size of the buffer
-*/
-void print_buffer(const char *buffer, size_t size);
